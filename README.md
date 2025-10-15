@@ -38,3 +38,30 @@ Los datos que he considerado relevantes han sido:
 - fecha de inicio de contacto
 
 Además de eso incluye metricas tales como la estancia promedio en días, el coste promedio por caso, y las fechas de contacto más temprana y reciente por grupo. Esta vista permite identificar tendencias en diagnósticos, costes hospitalarios, y severidad de casos por región, sexo, y día, facilitando decisiones en salud pública.
+
+Consulta empleada para la creación de la vista:
+```SQL
+CREATE OR REPLACE VIEW VISTA_MUY_INTERESANTE AS
+SELECT 
+    COUNT(*) AS total_casos,
+    e."Comunidad Autónoma",
+    e.SEXO,
+    e."Diagnóstico Principal",
+    e."Categoría",
+    e.NIVEL_SEVERIDAD_APR,
+    TRUNC(e.FECHA_DE_INICIO_CONTACTO) AS fecha_inicio_dia,
+    AVG(e."Estancia Días") AS estancia_promedio_dias,
+    AVG(e.COSTE_APR) AS coste_promedio,
+    MIN(e.FECHA_DE_INICIO_CONTACTO) AS primera_fecha_contacto,
+    MAX(e.FECHA_DE_INICIO_CONTACTO) AS ultima_fecha_contacto
+FROM ENFERMEDAD e
+WHERE e."Diagnóstico Principal" IS NOT NULL
+GROUP BY 
+    e."Comunidad Autónoma",
+    e.SEXO,
+    e."Diagnóstico Principal",
+    e."Categoría",
+    e.NIVEL_SEVERIDAD_APR,
+    TRUNC(e.FECHA_DE_INICIO_CONTACTO)
+ORDER BY e."Comunidad Autónoma", e.SEXO, total_casos DESC;
+```
