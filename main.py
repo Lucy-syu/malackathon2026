@@ -1,4 +1,4 @@
 import LoadData
 import pandas as pd
-consulta = "SELECT * FROM ENFERMEDAD WHERE INDICE=1 or INDICE=2"
+consulta = "SELECT * FROM ENFERMEDAD WHERE 'COMUNIDAD AUTÓNOMA' not in 'ANDALUCÍA'"
 print(LoadData.realizarConsulta(consulta))
