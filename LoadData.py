@@ -46,7 +46,7 @@ def devolverPorComunidadAutonoma(comunidad_autonoma: str):
     """
     
     connection = conexionBD()
-    query = 'SELECT * FROM ENFERMEDADES WHERE UPPER("Comunidad Autónoma") = UPPER(:1)'
+    query = 'SELECT * FROM ENFERMEDAD WHERE UPPER("Comunidad Autónoma") = UPPER(:1)'
 
     # pandas.read_sql maneja la conexión y los parámetros
     df = pd.read_sql(query, connection, params=[comunidad_autonoma])
