@@ -1,7 +1,7 @@
 import oracledb
 import os
 from dotenv import load_dotenv
-
+import pandas as pd
 
 load_dotenv()
 
@@ -28,36 +28,43 @@ def conexionBD():
     return connection
 
 def devolverPorComunidadAutonoma(comunidad_autonoma: str):
+    """
+    Devuelve un DataFrame con las filas de la tabla ENFERMEDADES 
+    filtradas por la Comunidad Autónoma especificada.
+
+    Args:
+        comunidad_autonoma (str): Nombre de la Comunidad Autónoma por la que filtrar. 
+                                  La comparación se realiza sin distinguir mayúsculas/minúsculas.
+
+    Returns:
+        pd.DataFrame: DataFrame con todas las columnas de la tabla ENFERMEDADES 
+                      correspondientes a la Comunidad Autónoma indicada. 
+                      Devuelve un DataFrame vacío si no se encuentran registros.
+
+    Raises:
+        oracledb.Error: Si hay un error al conectar o ejecutar la consulta en la base de datos.
+    """
+    
     connection = conexionBD()
-    cursor = connection.cursor()
-    
-    # Configuramos rowfactory
-    cursor.rowfactory = lambda *args: dict(zip([d[0] for d in cursor.description], args))
-    
     query = 'SELECT * FROM ENFERMEDADES WHERE UPPER("Comunidad Autónoma") = UPPER(:1)'
-    cursor.execute(query, [comunidad_autonoma])
-    
-    resultados = cursor.fetchall()
-    print("Resultados:", resultados)  # Depuración: imprime los resultados
-    print("Tipo de la primera fila:", type(resultados[0]) if resultados else "Lista vacía")  # Depuración: verifica el tipo
-    
-    cursor.close()
-    
-    return resultados
+
+    # pandas.read_sql maneja la conexión y los parámetros
+    df = pd.read_sql(query, connection, params=[comunidad_autonoma])
+
+    connection.close()
+    return df
+
+
 def realizarConsulta(consulta:str)->str:
     connection = conexionBD()
     if not connection:
         return
-    cursor = connection.cursor()
 
     try:
-        cursor.execute(consulta)
-        columnas = [col[0] for col in cursor.description]
-        resultados = [dict(zip(columnas, fila)) for fila in cursor.fetchall()]
-        return resultados
+        df = pd.read_sql(consulta, connection)
+        return df
     except oracledb.Error as e:
         print("Error en la consulta:", e)
         return []
     finally:
-        cursor.close()
         connection.close()

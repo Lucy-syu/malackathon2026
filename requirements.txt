@@ -2,3 +2,4 @@ oracledb
 flask
 python-dotenv
 git-filter-repo
+pandas
