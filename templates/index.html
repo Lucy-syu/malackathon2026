@@ -1,47 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Visualización de Datos Médicos</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-</head>
-<body>
-    <h1>Filtros de Búsqueda</h1>
-    <form method="POST">
-        Comunidad Autónoma: <input type="text" name="comunidad"><br>
-        Sexo (1=Hombre, 2=Mujer): <input type="number" name="sexo"><br>
-        Edad Mínima: <input type="number" name="edad_min"><br>
-        Edad Máxima: <input type="number" name="edad_max"><br>
-        Diagnóstico Principal: <input type="text" name="diagnostico"><br>
-        <input type="submit" value="Filtrar">
-    </form>
-    
-    {% if resultados %}
-        <h2>Resultados</h2>
-        <table border="1">
-            <tr>
-                {% for key in resultados[0].keys() %}
-                    <th>{{ key }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in resultados %}
-                <tr>
-                    {% for value in row.values() %}
-                        <td>{{ value }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
-        
-        <h2>Visualizaciones</h2>
-        {% if plot_bar %}
-            <div>{{ plot_bar | safe }}</div>
-        {% endif %}
-        {% if plot_pie %}
-            <div>{{ plot_pie | safe }}</div>
-        {% endif %}
-        {% if plot_hist %}
-            <div>{{ plot_hist | safe }}</div>
-        {% endif %}
-    {% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h2>Bienvenido a la aplicación de Enfermedades</h2>
+    <p>Selecciona una opción para continuar:</p>
+    <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Filtrar y ver gráficos</a>
+        <a href="{{ url_for('usuario') }}" class="btn btn-secondary btn-lg">Consultar enfermedad por ID</a>
+    </div>
+</div>
+{% endblock %}

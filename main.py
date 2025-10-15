@@ -1,4 +1,5 @@
 import LoadData
 import pandas as pd
-consulta = "SELECT * FROM ENFERMEDAD WHERE 'COMUNIDAD AUTÓNOMA' not in 'ANDALUCÍA'"
-print(LoadData.realizarConsulta(consulta))
+prompt = "Muéstrame los 10 primeros pacientes con enfermedad respiratoria en Andalucía"
+df = LoadData.consultaLenguajeNatural(prompt)
+print(df.head())

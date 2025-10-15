@@ -1,31 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Consulta por ID</title>
-</head>
-<body>
-    <h1>Consulta por ID de Enfermedad</h1>
-    <form method="POST">
-        ID: <input type="number" name="id"><br>
-        <input type="submit" value="Buscar">
+{% extends "base.html" %}
+
+{% block title %}Consulta por ID{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+    <h2>Consulta por ID de Enfermedad</h2>
+    <form method="POST" class="row g-3 mb-3">
+        <div class="col-auto">
+            <input type="number" name="id" class="form-control" placeholder="ID" required>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Buscar</button>
+        </div>
     </form>
     
     {% if resultados %}
-        <h2>Resultados</h2>
-        <table border="1">
-            <tr>
-                {% for key in resultados[0].keys() %}
-                    <th>{{ key }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in resultados %}
-                <tr>
-                    {% for value in row.values() %}
-                        <td>{{ value }}</td>
+        <h3>Resultados</h3>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        {% for key in resultados[0].keys() %}
+                            <th>{{ key }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in resultados %}
+                        <tr>
+                            {% for value in row.values() %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
+                </tbody>
+            </table>
+        </div>
     {% endif %}
-</body>
-</html>
+</div>
+{% endblock %}

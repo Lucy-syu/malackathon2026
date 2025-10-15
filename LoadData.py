@@ -65,3 +65,60 @@ def realizarConsulta(consulta: str, params: list = None) -> pd.DataFrame:
         return pd.DataFrame()
     finally:
         connection.close()
+        
+def consultaLenguajeNatural(prompt: str) -> pd.DataFrame:
+    """
+    Realiza una consulta en lenguaje natural sobre la base de datos Oracle 
+    y devuelve los resultados en un DataFrame.
+
+    Args:
+        prompt (str): Consulta en lenguaje natural.
+
+    Returns:
+        pd.DataFrame: Resultados de la consulta. Devuelve un DataFrame vacío si hay error.
+    """
+    connection = conexionBD()
+    
+    try:
+        # Generar SQL desde lenguaje natural usando DBMS_CLOUD.AI_GENERATE_SQL
+        plsql_block = f"""
+        DECLARE
+            l_sql CLOB;
+        BEGIN
+            l_sql := DBMS_CLOUD.AI_GENERATE_SQL(
+                prompt => '{prompt}'
+            );
+            DBMS_OUTPUT.PUT_LINE(l_sql);
+        END;
+        """
+
+        # Ejecutamos el bloque PL/SQL
+        cursor = connection.cursor()
+        cursor.execute(plsql_block)
+
+        # Capturamos el SQL generado desde DBMS_OUTPUT
+        # oracledb no captura automáticamente DBMS_OUTPUT, necesitamos activarlo:
+        cursor.callproc("DBMS_OUTPUT.ENABLE")
+        cursor.execute(plsql_block)
+
+        output_lines = []
+        while True:
+            line = cursor.callfunc("DBMS_OUTPUT.GET_LINE", str, [None])
+            if line is None:
+                break
+            output_lines.append(line)
+        sql_generated = " ".join(output_lines)
+
+        if not sql_generated.strip():
+            print("No se generó SQL.")
+            return pd.DataFrame()
+
+        # Ejecutamos el SQL generado y devolvemos resultados
+        df = pd.read_sql(sql_generated, connection)
+        return df
+
+    except oracledb.Error as e:
+        print("Error en la consulta en lenguaje natural:", e)
+        return pd.DataFrame()
+    finally:
+        connection.close()
