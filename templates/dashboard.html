@@ -64,6 +64,14 @@
         {% if plot_hist %}
             <div class="mb-4">{{ plot_hist | safe }}</div>
         {% endif %}
+        {% if plot_diag %}
+            <div class="mb-4">{{ plot_diag | safe }}</div>
+        {% endif %}
+
+        {% if plot_cat %}
+            <div class="mb-4">{{ plot_cat | safe }}</div>
+        {% endif %}
+
     {% endif %}
 
 </div>
