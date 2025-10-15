@@ -1,55 +1,47 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta por Comunidad Autónoma</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Visualización de Datos Médicos</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-<div class="container my-5">
-    <h1 class="mb-4 text-center">Buscar Enfermedades por Comunidad Autónoma</h1>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="comunidad" class="form-label">Comunidad Autónoma:</label>
-                    <input type="text" class="form-control" id="comunidad" name="comunidad" placeholder="Ej: Madrid" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Buscar</button>
-            </form>
-        </div>
-    </div>
-
+    <h1>Filtros de Búsqueda</h1>
+    <form method="POST">
+        Comunidad Autónoma: <input type="text" name="comunidad"><br>
+        Sexo (1=Hombre, 2=Mujer): <input type="number" name="sexo"><br>
+        Edad Mínima: <input type="number" name="edad_min"><br>
+        Edad Máxima: <input type="number" name="edad_max"><br>
+        Diagnóstico Principal: <input type="text" name="diagnostico"><br>
+        <input type="submit" value="Filtrar">
+    </form>
+    
     {% if resultados %}
-        {% if resultados|length > 0 %}
-            <div class="table-responsive mt-4">
-                <table class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            {% for col in resultados[0].keys() %}
-                                <th>{{ col }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for fila in resultados %}
-                            <tr>
-                                {% for valor in fila.values() %}
-                                    <td>{{ valor }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="text-warning mt-3">No se encontraron resultados.</p>
+        <h2>Resultados</h2>
+        <table border="1">
+            <tr>
+                {% for key in resultados[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in resultados %}
+                <tr>
+                    {% for value in row.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        
+        <h2>Visualizaciones</h2>
+        {% if plot_bar %}
+            <div>{{ plot_bar | safe }}</div>
+        {% endif %}
+        {% if plot_pie %}
+            <div>{{ plot_pie | safe }}</div>
+        {% endif %}
+        {% if plot_hist %}
+            <div>{{ plot_hist | safe }}</div>
         {% endif %}
     {% endif %}
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

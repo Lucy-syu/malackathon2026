@@ -55,16 +55,13 @@ def devolverPorComunidadAutonoma(comunidad_autonoma: str):
     return df
 
 
-def realizarConsulta(consulta:str)->str:
+def realizarConsulta(consulta: str, params: list = None) -> pd.DataFrame:
     connection = conexionBD()
-    if not connection:
-        return
-
     try:
-        df = pd.read_sql(consulta, connection)
+        df = pd.read_sql(consulta, connection, params=params or [])
         return df
     except oracledb.Error as e:
         print("Error en la consulta:", e)
-        return []
+        return pd.DataFrame()
     finally:
         connection.close()
