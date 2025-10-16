@@ -270,9 +270,29 @@ def lenguaje_natural():
             try:
                 df, sql_generado = LoadData.consultaNaturalGemini(query_text)
                 resultados = df.to_dict(orient='records')
-                charts = generate_charts(df)
             except Exception as e:
                 return render_template("error.html", error=str(e))
+            try:
+                charts = generate_charts(df)
+            except Exception as chart_error:
+                print("Error generando gráficos:", chart_error)
+
+                charts = {
+                    "plot_bar": None,
+                    "plot_pie": None,
+                    "plot_hist": None,
+                    "plot_diag": None,
+                    "plot_cat": None
+                }
+        
+            charts = {
+                    "plot_bar": None,
+                    "plot_pie": None,
+                    "plot_hist": None,
+                    "plot_diag": None,
+                    "plot_cat": None
+            }
+            #return render_template("error.html", error=str(e))
 
             return render_template(
                 "lenguaje_natural.html",
@@ -318,4 +338,4 @@ def vision_general():
 # Ejecutar app
 # ------------------------------
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5000,debug=False)

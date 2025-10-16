@@ -102,13 +102,17 @@ def consultaNaturalGemini(pregunta: str) -> tuple[pd.DataFrame, str]:
         esquema_texto = "\n".join(f"{tabla}({', '.join(columnas)})" for tabla, columnas in esquema.items())
 
         prompt_sql = f"""
-        Eres un asistente experto en SQL para Oracle. Genera solo la consulta SQL compatible con Oracle.
-        Esquema de base de datos:
-        {esquema_texto}
+            Eres un experto en SQL Oracle.
+            Genera SOLO la consulta SQL (sin comentarios ni explicación) válida para Oracle.
+            Usa exactamente los nombres de columnas que se muestran a continuación, sin traducirlos ni añadir tildes ni espacios.
+            
+            Si te preguntan por el sexo en esa columna el valor 1 significa hombre y el 2 mujer. Osea sería SEXO = 1 en caso de que sea hombre si se pide acontinuación
+            Esquema:
+            {esquema_texto}
 
-        Pregunta del usuario:
-        {pregunta}
-        """
+            Pregunta del usuario:
+            {pregunta}
+            """
 
         raw_sql = model.generate_content(prompt_sql)
         sql_generado = raw_sql.text.strip().strip("```sql").strip("```")
