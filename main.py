@@ -1,9 +1,7 @@
 import LoadData
 import pandas as pd
-prompt = "SELECT * FROM ENFERMEDAD"
+prompt = ""
 df = LoadData.realizarConsulta(prompt)
-
-
-print(df.head())
+print(df)
 
 

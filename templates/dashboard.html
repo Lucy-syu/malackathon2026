@@ -9,28 +9,324 @@
 
     <!-- Formulario de filtros -->
     <form method="POST" class="row g-3 mb-4 justify-content-center">
+
+        <!-- Comunidad Autónoma (multiselect) -->
         <div class="col-md-3">
-            <input type="text" class="form-control" name="comunidad" placeholder="Comunidad Autónoma">
+            <label for="comunidad" class="form-label">Comunidad Autónoma</label>
+            <select class="form-control" name="comunidad" id="comunidad"> 
+                <!--Se puede hacer multichoise con el atributo    multiple al final de la clase-->
+                <option value="">Todas</option>
+                <option value="Andalucía">Andalucía</option>
+                <option value="La Rioja">La Rioja</option>
+            </select>
         </div>
+
+        <!-- Sexo -->
         <div class="col-md-2">
-            <input type="number" class="form-control" name="sexo" placeholder="Sexo (1=H,2=M)">
+            <label for="sexo" class="form-label">Sexo</label>
+            <select class="form-control" name="sexo" id="sexo">
+                <option value="">Todos</option>
+                <option value="1">Hombre</option>
+                <option value="2">Mujer</option>
+            </select>
         </div>
+
+        <!-- Edad mínima -->
         <div class="col-md-2">
-            <input type="number" class="form-control" name="edad_min" placeholder="Edad Mín">
+            <label for="edad_min" class="form-label">Edad Mín</label>
+            <input type="number" class="form-control" name="edad_min" id="edad_min" placeholder="Edad Mín">
         </div>
+
+        <!-- Edad máxima -->
         <div class="col-md-2">
-            <input type="number" class="form-control" name="edad_max" placeholder="Edad Máx">
+            <label for="edad_max" class="form-label">Edad Máx</label>
+            <input type="number" class="form-control" name="edad_max" id="edad_max" placeholder="Edad Máx">
         </div>
+
+        <!-- Diagnóstico Principal (multiselect) -->
         <div class="col-md-3">
-            <input type="text" class="form-control" name="diagnostico" placeholder="Diagnóstico Principal">
+            <label for="diagnostico" class="form-label">Diagnóstico Principal</label>
+            <select class="form-control" name="diagnostico" id="diagnostico">
+                <option value="">Ninguno</option>
+                <option value="F60.3">F60.3</option>
+                <option value="F20.0">F20.0</option>
+                <option value="F10.230">F10.230</option>
+                <option value="F20.9">F20.9</option>
+                <option value="F31.0">F31.0</option>
+                <option value="F91.9">F91.9</option>
+                <option value="F25.0">F25.0</option>
+                <option value="F32.9">F32.9</option>
+                <option value="F12.251">F12.251</option>
+                <option value="F34.1">F34.1</option>
+                <option value="F31.2">F31.2</option>
+                <option value="F20.5">F20.5</option>
+                <option value="F41.9">F41.9</option>
+                <option value="F60.0">F60.0</option>
+                <option value="F60.2">F60.2</option>
+                <option value="F60.1">F60.1</option>
+                <option value="F10.120">F10.120</option>
+                <option value="F29">F29</option>
+                <option value="F60.7">F60.7</option>
+                <option value="F41.1">F41.1</option>
+                <option value="F30.9">F30.9</option>
+                <option value="F10.27">F10.27</option>
+                <option value="F33.9">F33.9</option>
+                <option value="F60.5">F60.5</option>
+                <option value="F10.188">F10.188</option>
+                <option value="F60.89">F60.89</option>
+                <option value="F20.81">F20.81</option>
+                <option value="F33.2">F33.2</option>
+                <option value="F21">F21</option>
+                <option value="F99">F99</option>
+                <option value="F41.8">F41.8</option>
+                <option value="F91.8">F91.8</option>
+                <option value="F44.9">F44.9</option>
+                <option value="F60.4">F60.4</option>
+                <option value="F25.9">F25.9</option>
+                <option value="F10.288">F10.288</option>
+                <option value="F31.31">F31.31</option>
+                <option value="F10.24">F10.24</option>
+                <option value="F20.3">F20.3</option>
+                <option value="F33.0">F33.0</option>
+                <option value="F31.9">F31.9</option>
+                <option value="F30.2">F30.2</option>
+                <option value="F13.20">F13.20</option>
+                <option value="F30.8">F30.8</option>
+                <option value="F44.6">F44.6</option>
+                <option value="F25.8">F25.8</option>
+                <option value="F44.89">F44.89</option>
+                <option value="F31.4">F31.4</option>
+                <option value="F32.1">F32.1</option>
+                <option value="F60.9">F60.9</option>
+                <option value="F10.10">F10.10</option>
+                <option value="F39">F39</option>
+                <option value="F28">F28</option>
+                <option value="F31.5">F31.5</option>
+                <option value="F45.0">F45.0</option>
+                <option value="F44.4">F44.4</option>
+                <option value="F45.9">F45.9</option>
+                <option value="F63.9">F63.9</option>
+                <option value="F63.0">F63.0</option>
+                <option value="F33.1">F33.1</option>
+                <option value="F33.3">F33.3</option>
+                <option value="F45.1">F45.1</option>
+                <option value="F95.8">F95.8</option>
+                <option value="F43.21">F43.21</option>
+                <option value="F10.150">F10.150</option>
+                <option value="F34.0">F34.0</option>
+                <option value="F43.23">F43.23</option>
+                <option value="F69">F69</option>
+                <option value="F31.10">F31.10</option>
+                <option value="F95.2">F95.2</option>
+                <option value="F20.1">F20.1</option>
+                <option value="F44.1">F44.1</option>
+                <option value="F10.220">F10.220</option>
+                <option value="F20.2">F20.2</option>
+                <option value="F10.239">F10.239</option>
+                <option value="F32.2">F32.2</option>
+                <option value="F12.288">F12.288</option>
+                <option value="F32.0">F32.0</option>
+                <option value="F45.8">F45.8</option>
+                <option value="F12.259">F12.259</option>
+                <option value="F25.1">F25.1</option>
+                <option value="F41.3">F41.3</option>
+                <option value="F45.21">F45.21</option>
+                <option value="F68.8">F68.8</option>
+                <option value="F30.10">F30.10</option>
+                <option value="F19.29">F19.29</option>
+                <option value="F33.8">F33.8</option>
+                <option value="F10.21">F10.21</option>
+                <option value="F41.0">F41.0</option>
+                <option value="F10.129">F10.129</option>
+                <option value="F31.13">F31.13</option>
+                <option value="F20.89">F20.89</option>
+                <option value="F11.23">F11.23</option>
+                <option value="F44.81">F44.81</option>
+                <option value="F19.259">F19.259</option>
+                <option value="F50.9">F50.9</option>
+                <option value="F40.02">F40.02</option>
+                <option value="F50.00">F50.00</option>
+                <option value="F11.20">F11.20</option>
+                <option value="F60.81">F60.81</option>
+                <option value="F64.1">F64.1</option>
+                <option value="F31.30">F31.30</option>
+                <option value="F11.251">F11.251</option>
+                <option value="F10.20">F10.20</option>
+                <option value="F32.3">F32.3</option>
+                <option value="F51.19">F51.19</option>
+                <option value="F60.6">F60.6</option>
+                <option value="F43.0">F43.0</option>
+                <option value="F50.2">F50.2</option>
+                <option value="F43.25">F43.25</option>
+                <option value="F40.8">F40.8</option>
+                <option value="F44.5">F44.5</option>
+                <option value="F31.32">F31.32</option>
+                <option value="F30.13">F30.13</option>
+                <option value="F31.70">F31.70</option>
+                <option value="F10.229">F10.229</option>
+                <option value="F48.1">F48.1</option>
+                <option value="F48.8">F48.8</option>
+                <option value="F44.7">F44.7</option>
+                <option value="F14.959">F14.959</option>
+                <option value="F43.29">F43.29</option>
+                <option value="F11.288">F11.288</option>
+                <option value="F50.01">F50.01</option>
+                <option value="F93.8">F93.8</option>
+                <option value="F45.20">F45.20</option>
+                <option value="F10.19">F10.19</option>
+                <option value="F31.64">F31.64</option>
+                <option value="F43.8">F43.8</option>
+                <option value="F95.9">F95.9</option>
+                <option value="F95.1">F95.1</option>
+                <option value="F95.0">F95.0</option>
+                <option value="F31.11">F31.11</option>
+                <option value="F10.121">F10.121</option>
+                <option value="F11.93">F11.93</option>
+                <option value="F43.22">F43.22</option>
+                <option value="F14.288">F14.288</option>
+                <option value="F10.232">F10.232</option>
+                <option value="F19.288">F19.288</option>
+                <option value="F44.0">F44.0</option>
+                <option value="F10.151">F10.151</option>
+                <option value="F12.959">F12.959</option>
+                <option value="F30.11">F30.11</option>
+                <option value="F14.250">F14.250</option>
+                <option value="F10.180">F10.180</option>
+                <option value="F14.23">F14.23</option>
+                <option value="F10.26">F10.26</option>
+                <option value="F91.0">F91.0</option>
+                <option value="F12.99">F12.99</option>
+                <option value="F12.21">F12.21</option>
+                <option value="F14.251">F14.251</option>
+                <option value="F14.222">F14.222</option>
+                <option value="F24">F24</option>
+                <option value="F31.12">F31.12</option>
+                <option value="F31.60">F31.60</option>
+                <option value="F12.29">F12.29</option>
+                <option value="F31.81">F31.81</option>
+                <option value="F10.921">F10.921</option>
+                <option value="F13.29">F13.29</option>
+                <option value="F31.74">F31.74</option>
+                <option value="F68.10">F68.10</option>
+                <option value="F10.221">F10.221</option>
+                <option value="F40.9">F40.9</option>
+                <option value="F10.14">F10.14</option>
+                <option value="F14.24">F14.24</option>
+                <option value="F31.75">F31.75</option>
+                <option value="F12.280">F12.280</option>
+                <option value="F19.20">F19.20</option>
+                <option value="F13.230">F13.230</option>
+                <option value="F31.62">F31.62</option>
+                <option value="F11.259">F11.259</option>
+                <option value="F10.99">F10.99</option>
+                <option value="F43.24">F43.24</option>
+                <option value="F14.21">F14.21</option>
+                <option value="F10.259">F10.259</option>
+                <option value="F14.29">F14.29</option>
+                <option value="F33.41">F33.41</option>
+                <option value="F11.21">F11.21</option>
+                <option value="F34.9">F34.9</option>
+                <option value="F10.280">F10.280</option>
+                <option value="F40.01">F40.01</option>
+                <option value="F18.20">F18.20</option>
+                <option value="F10.159">F10.159</option>
+                <option value="F14.229">F14.229</option>
+                <option value="F10.231">F10.231</option>
+                <option value="F51.11">F51.11</option>
+                <option value="F50.02">F50.02</option>
+                <option value="F19.988">F19.988</option>
+                <option value="F63.81">F63.81</option>
+                <option value="F40.298">F40.298</option>
+                <option value="F13.231">F13.231</option>
+                <option value="F51.8">F51.8</option>
+                <option value="F12.988">F12.988</option>
+                <option value="F63.89">F63.89</option>
+                <option value="F14.259">F14.259</option>
+                <option value="F10.988">F10.988</option>
+                <option value="F68.12">F68.12</option>
+                <option value="F30.12">F30.12</option>
+                <option value="F14.950">F14.950</option>
+                <option value="F19.959">F19.959</option>
+                <option value="F10.929">F10.929</option>
+                <option value="F19.950">F19.950</option>
+                <option value="F13.220">F13.220</option>
+                <option value="F12.250">F12.250</option>
+                <option value="F31.61">F31.61</option>
+                <option value="F19.251">F19.251</option>
+                <option value="F43.10">F43.10</option>
+                <option value="F10.250">F10.250</option>
+                <option value="F63.2">F63.2</option>
+                <option value="F33.42">F33.42</option>
+                <option value="F10.251">F10.251</option>
+                <option value="F19.99">F19.99</option>
+                <option value="F68.11">F68.11</option>
+                <option value="F12.950">F12.950</option>
+                <option value="F10.951">F10.951</option>
+                <option value="F14.988">F14.988</option>
+                <option value="F43.12">F43.12</option>
+                <option value="F31.73">F31.73</option>
+                <option value="F19.97">F19.97</option>
+                <option value="F43.11">F43.11</option>
+                <option value="F11.229">F11.229</option>
+                <option value="F45.22">F45.22</option>
+                <option value="F33.40">F33.40</option>
+                <option value="F94.0">F94.0</option>
+                <option value="F14.221">F14.221</option>
+                <option value="F14.94">F14.94</option>
+                <option value="F94.8">F94.8</option>
+                <option value="F93.0">F93.0</option>
+                <option value="F19.221">F19.221</option>
+                <option value="F31.63">F31.63</option>
+                <option value="F13.982">F13.982</option>
+                <option value="F31.89">F31.89</option>
+                <option value="F10.950">F10.950</option>
+                <option value="F50.89">F50.89</option>
+                <option value="F14.280">F14.280</option>
+                <option value="F42.8">F42.8</option>
+                <option value="F40.10">F40.10</option>
+                <option value="F12.229">F12.229</option>
+                <option value="F13.959">F13.959</option>
+                <option value="F42.9">F42.9</option>
+                <option value="F42.2">F42.2</option>
+                <option value="F12.20">F12.20</option>
+                <option value="F10.94">F10.94</option>
+                <option value="F11.250">F11.250</option>
+                <option value="F13.280">F13.280</option>
+                <option value="F14.20">F14.20</option>
+                <option value="F19.220">F19.220</option>
+                <option value="F10.29">F10.29</option>
+                <option value="F32.89">F32.89</option>
+                <option value="F13.931">F13.931</option>
+                <option value="F13.288">F13.288</option>
+                <option value="F40.00">F40.00</option>
+                <option value="F51.3">F51.3</option>
+                <option value="F13.259">F13.259</option>
+                <option value="F11.94">F11.94</option>
+                <option value="F34.89">F34.89</option>
+                <option value="F19.24">F19.24</option>
+                <option value="F13.939">F13.939</option>
+                <option value="F14.90">F14.90</option>
+                <option value="F19.250">F19.250</option>
+                <option value="F14.220">F14.220</option>
+                <option value="F19.229">F19.229</option>
+                <option value="F19.922">F19.922</option>
+                <option value="F12.221">F12.221</option>
+            </select>
         </div>
-        <div class="col-md-2" >
-            <input type="number" class="form-control" name="numPacientes" placeholder="Numero de pacientes a consultar">
+
+        <!-- Número de pacientes -->
+        <div class="col-md-2">
+            <label for="numPacientes" class="form-label">Número de pacientes</label>
+            <input type="number" class="form-control" name="numPacientes" id="numPacientes" placeholder="Número de pacientes">
         </div>
+
+        <!-- Botón enviar -->
         <div class="col-12 text-center">
             <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
         </div>
+
     </form>
+
 
     <!-- Resultados -->
     {% if resultados %}
