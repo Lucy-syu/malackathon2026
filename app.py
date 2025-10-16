@@ -166,7 +166,7 @@ def index():
 def dashboard():
     resultados = None
     if request.method == "POST":
-        comunidad = sanitize_input(request.form.get("comunidad"))
+        comunidades = [sanitize_input(c) for c in request.form.getlist("comunidad") if c]
         sexo = request.form.get("sexo")
         edad_min = request.form.get("edad_min")
         edad_max = request.form.get("edad_max")
@@ -176,9 +176,12 @@ def dashboard():
         consulta = 'SELECT * FROM ENFERMEDAD WHERE 1=1'
         params = []
         
-        if comunidad:
-            consulta += ' AND UPPER("Comunidad Autónoma") = UPPER(:1)'
-            params.append(comunidad)
+        if comunidades:
+            placeholders = []
+            for c in comunidades:
+                placeholders.append(f":{len(params)+1}")
+                params.append(c.upper())
+            consulta += f' AND UPPER("Comunidad Autónoma") IN ({", ".join(placeholders)})'
         if sexo and sexo.isdigit():
             consulta += ' AND SEXO = :{}'.format(len(params)+1)
             params.append(int(sexo))
@@ -200,8 +203,8 @@ def dashboard():
             consulta += ' FETCH FIRST 100 ROWS ONLY'
         
         try:
-            if comunidad and len(params) == 1:
-                df = LoadData.devolverPorComunidadAutonoma(comunidad)
+            if comunidades and len(params) == 1:
+                df = LoadData.devolverPorComunidadAutonoma(comunidades)
             else:
                 connection = LoadData.conexionBD()
                 df = pd.read_sql(consulta, connection, params=params)
