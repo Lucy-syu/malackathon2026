@@ -170,7 +170,7 @@ def dashboard():
         sexo = request.form.get("sexo")
         edad_min = request.form.get("edad_min")
         edad_max = request.form.get("edad_max")
-        diagnostico = sanitize_input(request.form.get("diagnostico"))
+        diagnosticos = request.form.getlist("diagnostico") 
         pacientes = request.form.get("numPacientes")
         
         consulta = 'SELECT * FROM ENFERMEDAD WHERE 1=1'
@@ -188,9 +188,12 @@ def dashboard():
         if edad_max and edad_max.isdigit():
             consulta += ' AND EDAD <= :{}'.format(len(params)+1)
             params.append(int(edad_max))
-        if diagnostico:
-            consulta += ' AND UPPER("Diagnóstico Principal") LIKE UPPER(:{})'.format(len(params)+1)
-            params.append(f'%{diagnostico}%')
+        if diagnosticos:
+            condiciones = []
+            for d in diagnosticos:
+                condiciones.append(f'UPPER("Diagnóstico Principal") LIKE UPPER(:{len(params)+1})')
+                params.append(f"%{d}%")
+            consulta += " AND (" + " OR ".join(condiciones) + ")"
         if pacientes:
             consulta += f' FETCH FIRST {pacientes} ROWS ONLY'
         else:
