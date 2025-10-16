@@ -5,6 +5,7 @@ import pandas as pd
 
 load_dotenv()
 
+
 def conexionBD():
 
     username = os.getenv("DB_USERNAME")
@@ -66,59 +67,63 @@ def realizarConsulta(consulta: str, params: list = None) -> pd.DataFrame:
     finally:
         connection.close()
         
-def consultaLenguajeNatural(prompt: str) -> pd.DataFrame:
-    """
-    Realiza una consulta en lenguaje natural sobre la base de datos Oracle 
-    y devuelve los resultados en un DataFrame.
 
-    Args:
-        prompt (str): Consulta en lenguaje natural.
+def consultaNaturalGemini(pregunta: str) -> tuple[pd.DataFrame, str]:
+    import google.generativeai as genai
+    from dotenv import load_dotenv
+    import os
+    import pandas as pd
 
-    Returns:
-        pd.DataFrame: Resultados de la consulta. Devuelve un DataFrame vacío si hay error.
-    """
-    connection = conexionBD()
-    
+    load_dotenv()
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+    genai.configure(api_key=GOOGLE_API_KEY)
+    model = genai.GenerativeModel("gemini-2.5-flash")
+
+    connection = None
+    sql_generado = ""
+
     try:
-        # Generar SQL desde lenguaje natural usando DBMS_CLOUD.AI_GENERATE_SQL
-        plsql_block = f"""
-        DECLARE
-            l_sql CLOB;
-        BEGIN
-            l_sql := DBMS_CLOUD.AI_GENERATE_SQL(
-                prompt => '{prompt}'
-            );
-            DBMS_OUTPUT.PUT_LINE(l_sql);
-        END;
+        connection = conexionBD()
+        cursor = connection.cursor()
+
+        # Descubrir esquema
+        cursor.execute("""
+            SELECT table_name, column_name
+            FROM all_tab_columns
+            WHERE owner = UPPER(:1)
+            ORDER BY table_name, column_id
+        """, [os.getenv("DB_USERNAME").upper()])
+        esquema = {}
+        for table, column in cursor:
+            esquema.setdefault(table, []).append(column)
+
+        print("Pregunta recibida:", pregunta)
+
+        esquema_texto = "\n".join(f"{tabla}({', '.join(columnas)})" for tabla, columnas in esquema.items())
+
+        prompt_sql = f"""
+        Eres un asistente experto en SQL para Oracle. Genera solo la consulta SQL compatible con Oracle.
+        Esquema de base de datos:
+        {esquema_texto}
+
+        Pregunta del usuario:
+        {pregunta}
         """
 
-        # Ejecutamos el bloque PL/SQL
-        cursor = connection.cursor()
-        cursor.execute(plsql_block)
+        raw_sql = model.generate_content(prompt_sql)
+        sql_generado = raw_sql.text.strip().strip("```sql").strip("```")
+        sql_generado = sql_generado.replace(";", "").replace("\n", " ").replace("\t", " ")
 
-        # Capturamos el SQL generado desde DBMS_OUTPUT
-        # oracledb no captura automáticamente DBMS_OUTPUT, necesitamos activarlo:
-        cursor.callproc("DBMS_OUTPUT.ENABLE")
-        cursor.execute(plsql_block)
+        print("Consulta generada por Gemini:\n", sql_generado)
 
-        output_lines = []
-        while True:
-            line = cursor.callfunc("DBMS_OUTPUT.GET_LINE", str, [None])
-            if line is None:
-                break
-            output_lines.append(line)
-        sql_generated = " ".join(output_lines)
+        df = pd.read_sql(sql_generado, connection)
+        print("DataFrame shape:", df.shape)
+        return df, sql_generado
 
-        if not sql_generated.strip():
-            print("No se generó SQL.")
-            return pd.DataFrame()
+    except Exception as e:
+        print("Error al generar o ejecutar la consulta:", e)
+        return pd.DataFrame(), ""
 
-        # Ejecutamos el SQL generado y devolvemos resultados
-        df = pd.read_sql(sql_generated, connection)
-        return df
-
-    except oracledb.Error as e:
-        print("Error en la consulta en lenguaje natural:", e)
-        return pd.DataFrame()
     finally:
-        connection.close()
+        if connection:
+            connection.close()

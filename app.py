@@ -256,37 +256,38 @@ def usuario():
 @login_required
 def lenguaje_natural():
     resultados = None
+    sql_generado = None  # Optional: to show the generated SQL in the template
+
     if request.method == 'POST':
         query_text = sanitize_input(request.form.get('query'))
         if query_text:
             try:
-                # Mock query: fetch top 100 rows (to be replaced with your NLP logic)
-                consulta = 'SELECT * FROM ENFERMEDAD FETCH FIRST 100 ROWS ONLY'
-                connection = LoadData.conexionBD()
-                df = pd.read_sql(consulta, connection)
-                connection.close()
-                
+                # Gemini function now returns both the DataFrame and the generated SQL
+                df, sql_generado = LoadData.consultaNaturalGemini(query_text)
                 resultados = df.to_dict(orient='records')
-                charts = generate_charts(df)  # Generate charts using the new function
-                
+                charts = generate_charts(df)
             except Exception as e:
                 return render_template("error.html", error=str(e))
-            
+
             return render_template(
                 "lenguaje_natural.html",
                 resultados=resultados,
-                **charts  # Unpack charts dictionary to pass individual chart variables
+                sql_generado=sql_generado,
+                **charts
             )
-    
+
     return render_template(
         "lenguaje_natural.html",
         resultados=None,
+        sql_generado=None,
         plot_bar=None,
         plot_pie=None,
         plot_hist=None,
         plot_diag=None,
         plot_cat=None
     )
+
+
 # ------------------------------
 # Ejecutar app
 # ------------------------------
