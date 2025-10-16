@@ -285,13 +285,6 @@ def lenguaje_natural():
                     "plot_cat": None
                 }
         
-            charts = {
-                    "plot_bar": None,
-                    "plot_pie": None,
-                    "plot_hist": None,
-                    "plot_diag": None,
-                    "plot_cat": None
-            }
             #return render_template("error.html", error=str(e))
 
             return render_template(
