@@ -7,6 +7,7 @@
     <h2>Bienvenido a la aplicación de Enfermedades</h2>
     <p>Selecciona una opción para continuar:</p>
     <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <a href="{{ url_for('vision_general') }}" class="btn btn-success btn-lg">Visión General</a>
         <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Filtrar y ver gráficos</a>
         <a href="{{ url_for('usuario') }}" class="btn btn-secondary btn-lg">Consultar enfermedad por ID</a>
         <a href="{{ url_for('lenguaje_natural') }}" class="btn btn-info btn-lg">Consultas en lenguaje natural</a>

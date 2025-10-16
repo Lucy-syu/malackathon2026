@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Visión General{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Visión General de Estadísticas</h2>
+    
+    <!-- Visualizaciones -->
+    {% if plot_bar or plot_pie or plot_hist or plot_diag %}
+        <h3>Visualizaciones</h3>
+        {% if plot_bar %}
+            <div class="mb-4">{{ plot_bar | safe }}</div>
+        {% endif %}
+        {% if plot_pie %}
+            <div class="mb-4">{{ plot_pie | safe }}</div>
+        {% endif %}
+        {% if plot_hist %}
+            <div class="mb-4">{{ plot_hist | safe }}</div>
+        {% endif %}
+        {% if plot_diag %}
+            <div class="mb-4">{{ plot_diag | safe }}</div>
+        {% endif %}
+    {% else %}
+        <p class="text-center">No hay datos disponibles para mostrar.</p>
+    {% endif %}
+</div>
+{% endblock %}

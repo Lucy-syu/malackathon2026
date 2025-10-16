@@ -291,7 +291,28 @@ def lenguaje_natural():
         plot_diag=None,
         plot_cat=None
     )
+# ------------------------------
+# Visión General (estadísticas generales)
+# ------------------------------
+@app.route('/vision_general')
+@login_required
+def vision_general():
+    try:
+        # Query to fetch all records (limited to avoid performance issues)
+        consulta = 'SELECT * FROM ENFERMEDAD FETCH FIRST 1000 ROWS ONLY'
+        connection = LoadData.conexionBD()
+        df = pd.read_sql(consulta, connection)
+        connection.close()
 
+        # Generate charts
+        charts = generate_charts(df)
+
+        return render_template(
+            "vision_general.html",
+            **charts
+        )
+    except Exception as e:
+        return render_template("error.html", error=str(e))
 
 # ------------------------------
 # Ejecutar app
