@@ -7,17 +7,21 @@
 
     <h2 class="mb-4 text-center">Filtros de Búsqueda</h2>
 
+    <!-- Formulario de filtros -->
     <form method="POST" class="row g-3 mb-4 justify-content-center">
 
+        <!-- Comunidad Autónoma (multiselect) -->
         <div class="col-md-3">
             <label for="comunidad" class="form-label">Comunidad Autónoma</label>
-            <select class="form-control" name="comunidad" id="comunidad">
+            <select class="form-control" name="comunidad" id="comunidad"> 
+                <!--Se puede hacer multichoise con el atributo    multiple al final de la clase-->
                 <option value="">Todas</option>
                 <option value="Andalucía">Andalucía</option>
                 <option value="La Rioja">La Rioja</option>
             </select>
         </div>
 
+        <!-- Sexo -->
         <div class="col-md-2">
             <label for="sexo" class="form-label">Sexo</label>
             <select class="form-control" name="sexo" id="sexo">
@@ -27,16 +31,19 @@
             </select>
         </div>
 
+        <!-- Edad mínima -->
         <div class="col-md-2">
             <label for="edad_min" class="form-label">Edad Mín</label>
             <input type="number" class="form-control" name="edad_min" id="edad_min" placeholder="Edad Mín">
         </div>
 
+        <!-- Edad máxima -->
         <div class="col-md-2">
             <label for="edad_max" class="form-label">Edad Máx</label>
             <input type="number" class="form-control" name="edad_max" id="edad_max" placeholder="Edad Máx">
         </div>
 
+        <!-- Diagnóstico Principal (multiselect) -->
         <div class="col-md-3">
             <label for="diagnostico" class="form-label">Diagnóstico Principal</label>
             <select class="form-control" name="diagnostico" id="diagnostico">
@@ -307,11 +314,13 @@
             </select>
         </div>
 
+        <!-- Número de pacientes -->
         <div class="col-md-2">
             <label for="numPacientes" class="form-label">Número de pacientes</label>
             <input type="number" class="form-control" name="numPacientes" id="numPacientes" placeholder="Número de pacientes">
         </div>
 
+        <!-- Botón enviar -->
         <div class="col-12 text-center">
             <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
         </div>
@@ -319,6 +328,7 @@
     </form>
 
 
+    <!-- Resultados -->
     {% if resultados %}
         <h3 class="mt-4">Resultados</h3>
         <div class="table-responsive mb-4">
@@ -342,6 +352,7 @@
             </table>
         </div>
 
+        <!-- Visualizaciones -->
         <h3>Visualizaciones</h3>
         {% if plot_bar %}
             <div class="mb-4">{{ plot_bar | safe }}</div>
