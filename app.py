@@ -134,6 +134,7 @@ def dashboard():
         edad_min = request.form.get("edad_min")
         edad_max = request.form.get("edad_max")
         diagnostico = sanitize_input(request.form.get("diagnostico"))
+        pacientes = request.form.get("numPacientes")
         
         consulta = 'SELECT * FROM ENFERMEDAD WHERE 1=1'
         params = []
@@ -153,8 +154,10 @@ def dashboard():
         if diagnostico:
             consulta += ' AND UPPER("Diagnóstico Principal") LIKE UPPER(:{})'.format(len(params)+1)
             params.append(f'%{diagnostico}%')
-        
-        consulta += ' FETCH FIRST 100 ROWS ONLY'
+        if pacientes:
+            consulta += f' FETCH FIRST {pacientes} ROWS ONLY'
+        else:
+            consulta += ' FETCH FIRST 100 ROWS ONLY'
         
         try:
             if comunidad and len(params) == 1:
