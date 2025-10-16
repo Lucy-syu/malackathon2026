@@ -40,7 +40,8 @@ def load_user(user_id):
 def sanitize_input(value):
     if not value:
         return None
-    value = re.sub(r'[^\w\s-]', '', value.strip())[:100]
+    # Permite letras, números, espacios, guiones y puntos (para los códigos de diagnóstico)
+    value = re.sub(r'[^\w\s.-]', '', value.strip())[:100]
     return value if value else None
 
 # ------------------------------
@@ -58,48 +59,6 @@ def generate_histogram(df, x_col, title):
     fig = px.histogram(df, x=x_col, title=title)
     return fig.to_html(full_html=False)
 
-# ------------------------------
-# Función para generar gráficos
-# ------------------------------
-def generate_charts(df):
-    """
-    Generate various charts from a DataFrame.
-    Returns a dictionary with HTML strings for each chart.
-    """
-    charts = {
-        'plot_bar': None,
-        'plot_pie': None,
-        'plot_hist': None,
-        'plot_diag': None,
-        'plot_cat': None
-    }
-    
-    if not df.empty:
-        # Gráfico de barras: Casos por Comunidad Autónoma
-        df_grouped_comunidad = df.groupby('Comunidad Autónoma').size().reset_index(name='Count')
-        charts['plot_bar'] = generate_bar_chart(df_grouped_comunidad, 'Comunidad Autónoma', 'Count', 'Casos por Comunidad Autónoma')
-        
-        # Gráfico de pie: Distribución por Sexo
-        df_grouped_sexo = df.groupby('SEXO').size().reset_index(name='Count')
-        df_grouped_sexo['SEXO'] = df_grouped_sexo['SEXO'].map({1: 'Hombre', 2: 'Mujer', 0: 'Otro'})
-        charts['plot_pie'] = generate_pie_chart(df_grouped_sexo, 'Count', 'SEXO', 'Distribución por Sexo')
-        
-        # Histograma: Distribución de Edades
-        charts['plot_hist'] = generate_histogram(df, 'EDAD', 'Distribución de Edades')
-        
-        # Gráfico de pie: Top 10 Diagnósticos Principales
-        if 'Diagnóstico Principal' in df.columns:
-            df_diag = df['Diagnóstico Principal'].value_counts().reset_index()
-            df_diag.columns = ['Diagnóstico Principal', 'Count']
-            charts['plot_diag'] = generate_pie_chart(df_diag.head(10), 'Count', 'Diagnóstico Principal', 'Top 10 Diagnósticos Principales')
-        
-        # Gráfico de pie: Distribución por Categoría
-        if 'Categoría' in df.columns:
-            df_cat = df['Categoría'].value_counts().reset_index()
-            df_cat.columns = ['Categoría', 'Count']
-            charts['plot_cat'] = generate_pie_chart(df_cat, 'Count', 'Categoría', 'Distribución por Categoría')
-
-    return charts
 # ------------------------------
 # Rutas de usuario
 # ------------------------------
@@ -161,17 +120,25 @@ def index():
 # ------------------------------
 # Dashboard con filtros y gráficos
 # ------------------------------
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard', methods=['GET','POST'])
 @login_required
 def dashboard():
     resultados = None
+    plot_bar = None
+    plot_pie = None
+    plot_hist = None
+    
     if request.method == "POST":
         comunidad = sanitize_input(request.form.get("comunidad"))
         sexo = request.form.get("sexo")
         edad_min = request.form.get("edad_min")
         edad_max = request.form.get("edad_max")
-        diagnostico = sanitize_input(request.form.get("diagnostico"))
-        pacientes = request.form.get("numPacientes")
+        
+        # Obtener la lista de diagnósticos seleccionados
+        raw_diagnosticos = request.form.getlist("diagnostico")
+        # Limpiar y filtrar cualquier valor vacío o malicioso
+        diagnosticos = [sanitize_input(d) for d in raw_diagnosticos]
+        diagnosticos = [d for d in diagnosticos if d]
         
         consulta = 'SELECT * FROM ENFERMEDAD WHERE 1=1'
         params = []
@@ -188,44 +155,36 @@ def dashboard():
         if edad_max and edad_max.isdigit():
             consulta += ' AND EDAD <= :{}'.format(len(params)+1)
             params.append(int(edad_max))
-        if diagnostico:
-            consulta += ' AND UPPER("Diagnóstico Principal") LIKE UPPER(:{})'.format(len(params)+1)
-            params.append(f'%{diagnostico}%')
-        if pacientes:
-            consulta += f' FETCH FIRST {pacientes} ROWS ONLY'
-        else:
-            consulta += ' FETCH FIRST 100 ROWS ONLY'
+        
+        # Si hay diagnósticos seleccionados, construir la cláusula IN
+        if diagnosticos:
+            placeholders = ', '.join(f':{len(params) + i + 1}' for i in range(len(diagnosticos)))
+            consulta += f' AND "Diagnóstico Principal" IN ({placeholders})'
+            params.extend(diagnosticos)
+        
+        consulta += ' FETCH FIRST 100 ROWS ONLY'
         
         try:
-            if comunidad and len(params) == 1:
-                df = LoadData.devolverPorComunidadAutonoma(comunidad)
-            else:
-                connection = LoadData.conexionBD()
-                df = pd.read_sql(consulta, connection, params=params)
-                connection.close()
+            # Simplificamos la lógica de carga de datos
+            connection = LoadData.conexionBD()
+            df = pd.read_sql(consulta, connection, params=params)
+            connection.close()
             
             resultados = df.to_dict(orient='records')
-            charts = generate_charts(df)  # Generate charts using the new function
             
+            if not df.empty:
+                df_grouped_comunidad = df.groupby('Comunidad Autónoma').size().reset_index(name='Count')
+                plot_bar = generate_bar_chart(df_grouped_comunidad, 'Comunidad Autónoma', 'Count', 'Casos por Comunidad Autónoma')
+                
+                df_grouped_sexo = df.groupby('SEXO').size().reset_index(name='Count')
+                df_grouped_sexo['SEXO'] = df_grouped_sexo['SEXO'].map({1:'Hombre',2:'Mujer',0:'Otro'})
+                plot_pie = generate_pie_chart(df_grouped_sexo, 'Count', 'SEXO', 'Distribución por Sexo')
+                
+                plot_hist = generate_histogram(df, 'EDAD', 'Distribución de Edades')
         except Exception as e:
             return render_template("error.html", error=str(e))
-        
-        return render_template(
-            "dashboard.html",
-            resultados=resultados,
-            **charts  # Unpack charts dictionary to pass individual chart variables
-        )
     
-    return render_template(
-        "dashboard.html",
-        resultados=None,
-        plot_bar=None,
-        plot_pie=None,
-        plot_hist=None,
-        plot_diag=None,
-        plot_cat=None
-    )
-
+    return render_template("dashboard.html", resultados=resultados, plot_bar=plot_bar, plot_pie=plot_pie, plot_hist=plot_hist)
 
 # ------------------------------
 # Consulta por ID de enfermedad
@@ -248,45 +207,6 @@ def usuario():
         else:
             return render_template("error.html", error="ID inválido")
     return render_template("usuario.html", resultados=resultados)
-
-# ------------------------------
-# Consulta en lenguaje natural
-# ------------------------------
-@app.route('/lenguaje_natural', methods=['GET', 'POST'])
-@login_required
-def lenguaje_natural():
-    resultados = None
-    sql_generado = None  # Optional: to show the generated SQL in the template
-
-    if request.method == 'POST':
-        query_text = sanitize_input(request.form.get('query'))
-        if query_text:
-            try:
-                # Gemini function now returns both the DataFrame and the generated SQL
-                df, sql_generado = LoadData.consultaNaturalGemini(query_text)
-                resultados = df.to_dict(orient='records')
-                charts = generate_charts(df)
-            except Exception as e:
-                return render_template("error.html", error=str(e))
-
-            return render_template(
-                "lenguaje_natural.html",
-                resultados=resultados,
-                sql_generado=sql_generado,
-                **charts
-            )
-
-    return render_template(
-        "lenguaje_natural.html",
-        resultados=None,
-        sql_generado=None,
-        plot_bar=None,
-        plot_pie=None,
-        plot_hist=None,
-        plot_diag=None,
-        plot_cat=None
-    )
-
 
 # ------------------------------
 # Ejecutar app
