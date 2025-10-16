@@ -1,56 +1,58 @@
 {% extends "base.html" %}
 {% block title %}Consultas en Lenguaje Natural{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center">Consultas en Lenguaje Natural</h2>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Consultas en Lenguaje Natural</h2>
     <p class="text-center">Ingresa tu consulta en lenguaje natural para filtrar y ver resultados y gráficos.</p>
-    <form method="POST" class="mt-4">
-        <div class="form-group">
-            <label for="query">Consulta:</label>
-            <textarea class="form-control" id="query" name="query" rows="3" placeholder="Ejemplo: Muestra casos de hombres mayores de 50 años en Madrid con esquizofrenia" required></textarea>
+    <form method="POST" class="row g-3 mb-4 justify-content-center">
+        <div class="col-md-6">
+            <label for="query" class="form-label">Consulta:</label>
+            <textarea class="form-control" id="query" name="query" rows="3" placeholder="Ejemplo: Muestra casos de hombres mayores de 50 años en Madrid con diagnóstico de diabetes" required></textarea>
         </div>
-        <div class="text-center mt-3">
-            <button type="submit" class="btn btn-primary">Enviar Consulta</button>
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary mt-2">Enviar Consulta</button>
         </div>
     </form>
     {% if resultados %}
-    <hr class="my-4">
-    <h3>Resultados:</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                {% for key in resultados[0].keys() %}
-                <th>{{ key }}</th>
+    <h3 class="mt-4">Resultados</h3>
+    <div class="table-responsive mb-4">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    {% for key in resultados[0].keys() %}
+                    <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in resultados %}
+                <tr>
+                    {% for value in row.values() %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
                 {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in resultados %}
-            <tr>
-                {% for value in row.values() %}
-                <td>{{ value }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
     {% endif %}
+    {% if plot_bar or plot_pie or plot_hist or plot_diag or plot_cat %}
+    <h3>Visualizaciones</h3>
     {% if plot_bar %}
-    <hr class="my-4">
-    <h3>Gráficos:</h3>
-    {{ plot_bar | safe }}
+    <div class="mb-4">{{ plot_bar | safe }}</div>
     {% endif %}
     {% if plot_pie %}
-    {{ plot_pie | safe }}
+    <div class="mb-4">{{ plot_pie | safe }}</div>
     {% endif %}
     {% if plot_hist %}
-    {{ plot_hist | safe }}
+    <div class="mb-4">{{ plot_hist | safe }}</div>
     {% endif %}
     {% if plot_diag %}
-    {{ plot_diag | safe }}
+    <div class="mb-4">{{ plot_diag | safe }}</div>
     {% endif %}
     {% if plot_cat %}
-    {{ plot_cat | safe }}
+    <div class="mb-4">{{ plot_cat | safe }}</div>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

@@ -59,6 +59,48 @@ def generate_histogram(df, x_col, title):
     return fig.to_html(full_html=False)
 
 # ------------------------------
+# Función para generar gráficos
+# ------------------------------
+def generate_charts(df):
+    """
+    Generate various charts from a DataFrame.
+    Returns a dictionary with HTML strings for each chart.
+    """
+    charts = {
+        'plot_bar': None,
+        'plot_pie': None,
+        'plot_hist': None,
+        'plot_diag': None,
+        'plot_cat': None
+    }
+    
+    if not df.empty:
+        # Gráfico de barras: Casos por Comunidad Autónoma
+        df_grouped_comunidad = df.groupby('Comunidad Autónoma').size().reset_index(name='Count')
+        charts['plot_bar'] = generate_bar_chart(df_grouped_comunidad, 'Comunidad Autónoma', 'Count', 'Casos por Comunidad Autónoma')
+        
+        # Gráfico de pie: Distribución por Sexo
+        df_grouped_sexo = df.groupby('SEXO').size().reset_index(name='Count')
+        df_grouped_sexo['SEXO'] = df_grouped_sexo['SEXO'].map({1: 'Hombre', 2: 'Mujer', 0: 'Otro'})
+        charts['plot_pie'] = generate_pie_chart(df_grouped_sexo, 'Count', 'SEXO', 'Distribución por Sexo')
+        
+        # Histograma: Distribución de Edades
+        charts['plot_hist'] = generate_histogram(df, 'EDAD', 'Distribución de Edades')
+        
+        # Gráfico de pie: Top 10 Diagnósticos Principales
+        if 'Diagnóstico Principal' in df.columns:
+            df_diag = df['Diagnóstico Principal'].value_counts().reset_index()
+            df_diag.columns = ['Diagnóstico Principal', 'Count']
+            charts['plot_diag'] = generate_pie_chart(df_diag.head(10), 'Count', 'Diagnóstico Principal', 'Top 10 Diagnósticos Principales')
+        
+        # Gráfico de pie: Distribución por Categoría
+        if 'Categoría' in df.columns:
+            df_cat = df['Categoría'].value_counts().reset_index()
+            df_cat.columns = ['Categoría', 'Count']
+            charts['plot_cat'] = generate_pie_chart(df_cat, 'Count', 'Categoría', 'Distribución por Categoría')
+
+    return charts
+# ------------------------------
 # Rutas de usuario
 # ------------------------------
 @app.route('/register', methods=['GET','POST'])
@@ -119,15 +161,10 @@ def index():
 # ------------------------------
 # Dashboard con filtros y gráficos
 # ------------------------------
-@app.route('/dashboard', methods=['GET','POST'])
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     resultados = None
-    plot_bar = None
-    plot_pie = None
-    plot_hist = None
-    plot_diag = None
-    plot_cat = None
     if request.method == "POST":
         comunidad = sanitize_input(request.form.get("comunidad"))
         sexo = request.form.get("sexo")
@@ -168,46 +205,26 @@ def dashboard():
                 connection.close()
             
             resultados = df.to_dict(orient='records')
+            charts = generate_charts(df)  # Generate charts using the new function
             
-            if not df.empty:
-                # Gráfico de barras: Casos por Comunidad Autónoma
-                df_grouped_comunidad = df.groupby('Comunidad Autónoma').size().reset_index(name='Count')
-                plot_bar = generate_bar_chart(df_grouped_comunidad, 'Comunidad Autónoma', 'Count', 'Casos por Comunidad Autónoma')
-
-                # Gráfico de pie: Distribución por Sexo
-                df_grouped_sexo = df.groupby('SEXO').size().reset_index(name='Count')
-                df_grouped_sexo['SEXO'] = df_grouped_sexo['SEXO'].map({1: 'Hombre', 2: 'Mujer', 0: 'Otro'})
-                plot_pie = generate_pie_chart(df_grouped_sexo, 'Count', 'SEXO', 'Distribución por Sexo')
-
-                # Histograma: Distribución de Edades
-                plot_hist = generate_histogram(df, 'EDAD', 'Distribución de Edades')
-
-                # Gráfico de quesos: Diagnóstico Principal
-                if 'Diagnóstico Principal' in df.columns:
-                    df_diag = df['Diagnóstico Principal'].value_counts().reset_index()
-                    df_diag.columns = ['Diagnóstico Principal', 'Count']
-                    plot_diag = generate_pie_chart(df_diag.head(10), 'Count', 'Diagnóstico Principal', 'Top 10 Diagnósticos Principales')
-
-                # Gráfico de quesos: Categoría
-                if 'Categoría' in df.columns:
-                    df_cat = df['Categoría'].value_counts().reset_index()
-                    df_cat.columns = ['Categoría', 'Count']
-                    plot_cat = generate_pie_chart(df_cat, 'Count', 'Categoría', 'Distribución por Categoría')
-                else:
-                    plot_cat = None
-
         except Exception as e:
             return render_template("error.html", error=str(e))
-    
-    return render_template(
+        
+        return render_template(
             "dashboard.html",
             resultados=resultados,
-            plot_bar=plot_bar,
-            plot_pie=plot_pie,
-            plot_hist=plot_hist,
-            plot_diag=plot_diag,
-            plot_cat=plot_cat
+            **charts  # Unpack charts dictionary to pass individual chart variables
         )
+    
+    return render_template(
+        "dashboard.html",
+        resultados=None,
+        plot_bar=None,
+        plot_pie=None,
+        plot_hist=None,
+        plot_diag=None,
+        plot_cat=None
+    )
 
 
 # ------------------------------
@@ -231,67 +248,44 @@ def usuario():
         else:
             return render_template("error.html", error="ID inválido")
     return render_template("usuario.html", resultados=resultados)
+
+# ------------------------------
+# Consulta en lenguaje natural
+# ------------------------------
 @app.route('/lenguaje_natural', methods=['GET', 'POST'])
 @login_required
 def lenguaje_natural():
     resultados = None
-    plot_bar = None
-    plot_pie = None
-    plot_hist = None
-    plot_diag = None
-    plot_cat = None
-
     if request.method == 'POST':
         query_text = sanitize_input(request.form.get('query'))
         if query_text:
-            # Aquí va el procesamiento real de NLP que harás tú.
-            # Por ahora, como mock, ejecutamos una consulta predeterminada similar al dashboard
-            # (por ejemplo, top 100 rows sin filtros específicos, o simula basado en query_text).
-            # Para el mock, usamos una consulta básica y generamos gráficos como en dashboard.
             try:
+                # Mock query: fetch top 100 rows (to be replaced with your NLP logic)
                 consulta = 'SELECT * FROM ENFERMEDAD FETCH FIRST 100 ROWS ONLY'
                 connection = LoadData.conexionBD()
                 df = pd.read_sql(consulta, connection)
                 connection.close()
                 
                 resultados = df.to_dict(orient='records')
+                charts = generate_charts(df)  # Generate charts using the new function
                 
-                if not df.empty:
-                    # Gráficos similares al dashboard (mock)
-                    # Gráfico de barras: Casos por Comunidad Autónoma
-                    df_grouped_comunidad = df.groupby('Comunidad Autónoma').size().reset_index(name='Count')
-                    plot_bar = generate_bar_chart(df_grouped_comunidad, 'Comunidad Autónoma', 'Count', 'Casos por Comunidad Autónoma')
-                    
-                    # Gráfico de pie: Distribución por Sexo
-                    df_grouped_sexo = df.groupby('SEXO').size().reset_index(name='Count')
-                    df_grouped_sexo['SEXO'] = df_grouped_sexo['SEXO'].map({1: 'Hombre', 2: 'Mujer', 0: 'Otro'})
-                    plot_pie = generate_pie_chart(df_grouped_sexo, 'Count', 'SEXO', 'Distribución por Sexo')
-                    
-                    # Histograma: Distribución de Edades
-                    plot_hist = generate_histogram(df, 'EDAD', 'Distribución de Edades')
-                    
-                    # Gráfico de pie: Top 10 Diagnósticos Principales
-                    if 'Diagnóstico Principal' in df.columns:
-                        df_diag = df['Diagnóstico Principal'].value_counts().reset_index()
-                        df_diag.columns = ['Diagnóstico Principal', 'Count']
-                        plot_diag = generate_pie_chart(df_diag.head(10), 'Count', 'Diagnóstico Principal', 'Top 10 Diagnósticos Principales')
-                    
-                    # Gráfico de pie: Distribución por Categoría
-                    if 'Categoría' in df.columns:
-                        df_cat = df['Categoría'].value_counts().reset_index()
-                        df_cat.columns = ['Categoría', 'Count']
-                        plot_cat = generate_pie_chart(df_cat, 'Count', 'Categoría', 'Distribución por Categoría')
             except Exception as e:
                 return render_template("error.html", error=str(e))
-
+            
+            return render_template(
+                "lenguaje_natural.html",
+                resultados=resultados,
+                **charts  # Unpack charts dictionary to pass individual chart variables
+            )
+    
     return render_template(
         "lenguaje_natural.html",
-        resultados=resultados,
-        plot_bar=plot_bar,
-        plot_pie=plot_pie,
-        plot_hist=plot_hist,
-        plot_diag=plot_diag,
-        plot_cat=plot_cat
+        resultados=None,
+        plot_bar=None,
+        plot_pie=None,
+        plot_hist=None,
+        plot_diag=None,
+        plot_cat=None
     )
 # ------------------------------
 # Ejecutar app
