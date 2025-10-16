@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Consultas en Lenguaje Natural{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Consultas en Lenguaje Natural</h2>
+    <p class="text-center">Ingresa tu consulta en lenguaje natural para filtrar y ver resultados y gráficos.</p>
+    <form method="POST" class="mt-4">
+        <div class="form-group">
+            <label for="query">Consulta:</label>
+            <textarea class="form-control" id="query" name="query" rows="3" placeholder="Ejemplo: Muestra casos de hombres mayores de 50 años en Madrid con esquizofrenia" required></textarea>
+        </div>
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary">Enviar Consulta</button>
+        </div>
+    </form>
+    {% if resultados %}
+    <hr class="my-4">
+    <h3>Resultados:</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                {% for key in resultados[0].keys() %}
+                <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in resultados %}
+            <tr>
+                {% for value in row.values() %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    {% if plot_bar %}
+    <hr class="my-4">
+    <h3>Gráficos:</h3>
+    {{ plot_bar | safe }}
+    {% endif %}
+    {% if plot_pie %}
+    {{ plot_pie | safe }}
+    {% endif %}
+    {% if plot_hist %}
+    {{ plot_hist | safe }}
+    {% endif %}
+    {% if plot_diag %}
+    {{ plot_diag | safe }}
+    {% endif %}
+    {% if plot_cat %}
+    {{ plot_cat | safe }}
+    {% endif %}
+</div>
+{% endblock %}
