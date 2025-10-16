@@ -330,6 +330,24 @@
 
     <!-- Resultados -->
     {% if resultados %}
+        <!-- Visualizaciones -->
+        <h3>Visualizaciones</h3>
+        {% if plot_bar %}
+            <div class="mb-4">{{ plot_bar | safe }}</div>
+        {% endif %}
+        {% if plot_pie %}
+            <div class="mb-4">{{ plot_pie | safe }}</div>
+        {% endif %}
+        {% if plot_hist %}
+            <div class="mb-4">{{ plot_hist | safe }}</div>
+        {% endif %}
+        {% if plot_diag %}
+            <div class="mb-4">{{ plot_diag | safe }}</div>
+        {% endif %}
+
+        {% if plot_cat %}
+            <div class="mb-4">{{ plot_cat | safe }}</div>
+        {% endif %}
         <h3 class="mt-4">Resultados</h3>
         <div class="table-responsive mb-4">
             <table class="table table-striped table-bordered">
@@ -352,24 +370,7 @@
             </table>
         </div>
 
-        <!-- Visualizaciones -->
-        <h3>Visualizaciones</h3>
-        {% if plot_bar %}
-            <div class="mb-4">{{ plot_bar | safe }}</div>
-        {% endif %}
-        {% if plot_pie %}
-            <div class="mb-4">{{ plot_pie | safe }}</div>
-        {% endif %}
-        {% if plot_hist %}
-            <div class="mb-4">{{ plot_hist | safe }}</div>
-        {% endif %}
-        {% if plot_diag %}
-            <div class="mb-4">{{ plot_diag | safe }}</div>
-        {% endif %}
-
-        {% if plot_cat %}
-            <div class="mb-4">{{ plot_cat | safe }}</div>
-        {% endif %}
+        
 
     {% endif %}
 
