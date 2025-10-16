@@ -213,7 +213,7 @@ def dashboard():
         return render_template(
             "dashboard.html",
             resultados=resultados,
-            **charts  # Unpack charts dictionary to pass individual chart variables
+            **charts  
         )
     
     return render_template(
@@ -256,13 +256,12 @@ def usuario():
 @login_required
 def lenguaje_natural():
     resultados = None
-    sql_generado = None  # Optional: to show the generated SQL in the template
+    sql_generado = None  
 
     if request.method == 'POST':
         query_text = sanitize_input(request.form.get('query'))
         if query_text:
             try:
-                # Gemini function now returns both the DataFrame and the generated SQL
                 df, sql_generado = LoadData.consultaNaturalGemini(query_text)
                 resultados = df.to_dict(orient='records')
                 charts = generate_charts(df)
